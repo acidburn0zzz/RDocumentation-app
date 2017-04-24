@@ -12,7 +12,7 @@ var dateFormat = require('dateformat');
 var autoLink = require('autolink-js');
 var marked = require('marked');
 var cheerio = require ('cheerio');
-
+var morgan = require('morgan');
 
 
 module.exports.http = {
@@ -38,6 +38,7 @@ module.exports.http = {
 
     order: [
       'startRequestTimer',
+      'logger',
       'cookieParser',
       'readRstudioSession',
       'session',
@@ -86,6 +87,8 @@ module.exports.http = {
     return next();
   },
 
+  logger: morgan("short"),
+
   paramsInjector: function (req, res, next) {
     res.locals.inViewerPane = (req.param('viewer_pane') === '1') ? true : false;
     res.locals.inCampus = (req.param('campus_app') === '1') ? true : false;
@@ -96,6 +99,7 @@ module.exports.http = {
     res.locals.autoLink = autoLink;
     res.locals.lodash = require('lodash');
     res.locals.striptags = require('striptags');
+    res.locals.dcBanner = req.cookies['banner-closed'] !== 'true';
 
     res.locals.md = function (md,baseLink) {
       //when multiple bases, pick the one from github
